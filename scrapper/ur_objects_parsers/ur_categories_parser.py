@@ -12,6 +12,9 @@ logger = logging.getLogger(__name__)
 
 
 class UrCategoriesParser(UrBaseParser):
+    """
+    Class to extract Category objects from URParts site
+    """
     _CONTAINER_CLASS_NAME: str = "c_container allmakes allcategories"
     PARSED_OBJECT_TYPE_NAME: str = "CATEGORY"
 

@@ -10,6 +10,9 @@ logger = logging.getLogger(__name__)
 
 
 class UrPartsParser(UrBaseParser):
+    """
+    Class to extract Part objects from URParts site
+    """
     _CONTAINER_CLASS_NAME: str = "c_container allparts"
     PARSED_OBJECT_TYPE_NAME: str = "PART"
 

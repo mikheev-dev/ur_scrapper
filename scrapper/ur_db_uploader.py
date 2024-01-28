@@ -16,6 +16,9 @@ logger = logging.getLogger(__name__)
 
 
 class UrDbUploader:
+    """
+    Class to upload scrapped data from files to database and normalize data
+    """
     _path_to_initial_migrations_dir: str
     _path_to_normalization_migrations_dir: str
 
@@ -38,12 +41,19 @@ class UrDbUploader:
             backend.apply_migrations(backend.to_apply(migrations))
 
     def apply_initial_migrations(self):
+        """
+        Apply initial migrations to create initial tables for scrapped data
+        """
+
         logger.info("Applying initial migrations.")
         st_time = time.time()
         self._apply_migrations(self._path_to_initial_migrations_dir)
         logger.info(f"Applied initial migrations for {time.time() - st_time}s")
 
     def apply_normalizing_ur_data_migrations(self):
+        """
+        Apply migrations to normalize uploaded data
+        """
         logger.info("Applying normalizing migrations.")
         st_time = time.time()
         self._apply_migrations(self._path_to_normalization_migrations_dir)
@@ -55,6 +65,14 @@ class UrDbUploader:
             table_fields: List[str],
             path_to_csv_file: str,
     ):
+        """
+        Upload data from csv file to table.
+
+        :param table_name: table name to upload data to
+        :param table_fields: list of table columns names in which data is stored in csv
+        :param path_to_csv_file: path to csv file
+        :return:
+        """
         logger.info(f"Started uploading {path_to_csv_file} to table {table_name}.")
         st_time = time.time()
         df = pd.read_csv(

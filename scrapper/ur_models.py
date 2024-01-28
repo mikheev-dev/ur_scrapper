@@ -23,5 +23,9 @@ class URManufacturer(BaseModel):
 
 
 class DependedObjectUrlModel(BaseModel):
+    """
+    Model contained extracted url to get new object from.
+    meta field are used for sending construction information to deeper objects
+    """
     url: str
     meta: Dict[str, Any]

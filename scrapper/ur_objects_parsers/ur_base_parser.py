@@ -13,11 +13,20 @@ logger = logging.getLogger(__name__)
 
 
 class UrBaseParser(ABC):
+    """
+    Class for extracting objects from URPart urls
+    """
     _CONTAINER_CLASS_NAME: str
     PARSED_OBJECT_TYPE_NAME: str
 
     @staticmethod
     async def _get_parsed_html_page(url: str, session: aiohttp.ClientSession) -> BeautifulSoup:
+        """
+        Get HTML page which contains objects.
+        :param url: url to get
+        :param session: aiohttp session
+        :return: parsed HTML page
+        """
         async with session.get(url) as resp:
             raw_page = await resp.text()
         return BeautifulSoup(raw_page, "html.parser")
@@ -27,6 +36,12 @@ class UrBaseParser(ABC):
             page: BeautifulSoup,
             container_class_name: str,
     ) -> List:
+        """
+        Find HTML containers with objects to parse
+        :param page: HTML page
+        :param container_class_name: target container name
+        :return: list of HTML container to get objects from
+        """
         target_div = page.find("div", class_=container_class_name)
         if not target_div:
             return []
@@ -38,6 +53,13 @@ class UrBaseParser(ABC):
             items: List,
             depended_object: DependedObjectUrlModel
     ) -> List[pydantic.BaseModel]:
+        """
+        Method to extract objects from HTML containers.
+        :param items: HTML containers
+        :param depended_object: Object with meta information from higher-level object
+        from which the url for current objects was got
+        :return: list of objects
+        """
         raise NotImplementedError
 
     @staticmethod
@@ -46,6 +68,12 @@ class UrBaseParser(ABC):
             items: List,
             depended_object: DependedObjectUrlModel
     ) -> List[DependedObjectUrlModel]:
+        """
+        Method to extract information from HTML containers of deeper objects: url and meta
+        :param items: HTML containers
+        :param depended_object: Object with meta information from higher-level object for creating new meta
+        :return: list of objects contained urls and meta for getting object
+        """
         raise NotImplementedError
 
     @classmethod
@@ -54,6 +82,12 @@ class UrBaseParser(ABC):
             depended_object: DependedObjectUrlModel,
             session: aiohttp.ClientSession,
     ) -> Tuple[List[pydantic.BaseModel], List[DependedObjectUrlModel]]:
+        """
+        Method to extract objects using url from depended_object
+        :param depended_object: object with url and meta information
+        :param session: aiohttp session
+        :return: tuple of extracted objects and objects to extract deeper objects
+        """
         st_time = time.time()
         page = await cls._get_parsed_html_page(
             url=depended_object.url,

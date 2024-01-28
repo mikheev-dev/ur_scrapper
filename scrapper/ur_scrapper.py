@@ -29,6 +29,41 @@ logger = logging.getLogger(__name__)
 
 
 class UrScrapper:
+    """
+    Class to scrap URParts site. Build multiprocessing pipeline:
+
+    [base URParts url] object
+          ||
+          ||
+          Queue for URL stored manufacturers
+          ||
+          ||
+        Puller process          ==== Manufacturers objects queue ====   Manufacturer objects saver process
+                |_ Manufacturers parses                                    |_ File saver (serialization to csv)
+          ||
+          ||
+          Queue for URL stored categories (and meta from [Manufacturer] level)
+          ||
+          ||
+        Puller process           ==== Categories objects queue ====      Category objects saver process
+                |_ Categories parses                                          |_ File saver (serialization to csv)
+          ||
+          ||
+          Queue for URL stored models (and meta from [Manufacturer, Category] level)
+          ||
+          ||
+        Puller process           ==== Models objects queue ====      Models objects saver process
+                |_ Models parses                                          |_ File saver (serialization to csv)
+          ||
+          ||
+          Queue for URL stored parts (and meta from [Category, Models] level)
+          ||
+          ||
+        Puller process           ==== Parts objects queue ====      Parts objects saver process
+                |_ Parts parses                                          |_ File saver (serialization to csv)
+
+
+    """
     _savers_processes: List[Process]
     _pullers_processes: List[Process]
 
@@ -163,6 +198,7 @@ class UrScrapper:
         for puller_proc in self._pullers_processes:
             puller_proc.start()
 
+        # Put initial object with URPart site url
         self._manufacturers_urls_q.put(
             DependedObjectUrlModel(
                 url=os.path.join(UR_URL, CATALOGUE_POSTFIX),

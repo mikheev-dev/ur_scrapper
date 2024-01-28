@@ -25,7 +25,10 @@ if __name__ == "__main__":
         logger.error(f"Exception {e} occurred while trying to get {target_url}.")
         request_status = 500
 
-    if request_status == 200:
+    if ScrapperAppConfig.UPLOAD_DATA_WITHOUT_SCRAPPING or request_status != 200:
+        logger.info("Scrapping from URL is disabled. Upload data from local dumps.")
+        FilesExtractor.extract_parts()
+    else:
         logger.info("Scrapping UR data")
         os.makedirs(ScrapperAppConfig.PATH_TO_SCRAPPED_FILES_DIR, exist_ok=True)
 
@@ -38,9 +41,6 @@ if __name__ == "__main__":
 
         scrapper.scrap()
         logger.info("UR data scrapped")
-    else:
-        logger.info("Scrapping from URL is disabled. Upload data from local dumps.")
-        FilesExtractor.extract_parts()
 
     logger.info("Uploading data to db")
     db_uploader = UrDbUploader(

@@ -12,6 +12,9 @@ logger = logging.getLogger(__name__)
 
 
 class UrModelsParser(UrBaseParser):
+    """
+    Class to extract Model objects from URParts site
+    """
     _CONTAINER_CLASS_NAME: str = "c_container allmodels"
     PARSED_OBJECT_TYPE_NAME: str = "MODEL"
 

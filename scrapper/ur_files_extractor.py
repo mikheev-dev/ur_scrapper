@@ -5,6 +5,9 @@ from scrapper.constants import PATH_TO_SCRAPPED_DATA, PARTS_TGZ_NAME
 
 
 class FilesExtractor:
+    """
+    Simple class to extract already scrapped parts data from .tgz.
+    """
     @staticmethod
     def extract_parts():
         part_file = tarfile.open(os.path.join(PATH_TO_SCRAPPED_DATA, PARTS_TGZ_NAME))

@@ -17,6 +17,11 @@ logger = logging.getLogger(__name__)
 
 
 class MPUrPuller(Process):
+    """
+    Process-based class connected to 3 queues and apply internal parser to extract:
+     1) objects
+     2) url and meta which are used of another pullers to extract objects
+    """
     _src_q: Queue
     _objects_dst_q: Queue
     _depended_objects_urls_q: Optional[Queue]
@@ -33,6 +38,13 @@ class MPUrPuller(Process):
             depended_objects_urls_q: Optional[Queue],
             chunk_size: int = CHUNK_SIZE,
     ):
+        """
+        :param object_parser: Parser of URL pages
+        :param src_q: Multiprocessing queue to get urls and metas from
+        :param objects_dst_q: Multiprocessing queue to put extracted objects
+        :param depended_objects_urls_q: Multiprocessing queue to put urls and metas
+        :param chunk_size: Chunk size to accumulate and async gather data
+        """
         super().__init__()
         self._src_q = src_q
         self._objects_dst_q = objects_dst_q
@@ -45,6 +57,12 @@ class MPUrPuller(Process):
             data_chunk: List[DependedObjectUrlModel],
             gathered_data: Tuple[Tuple[List[pydantic.BaseModel], List[DependedObjectUrlModel]]]
     ) -> List[Tuple[List[pydantic.BaseModel], List[DependedObjectUrlModel]]]:
+        """
+        Handle exceptions occurred during gathering data
+        :param data_chunk: chunk of source objects
+        :param gathered_data: tuple of pairs of gathered objects and url and meta
+        :return: list of pairs  of gathered objects and url and meta
+        """
         cleared_gathered_data = []
         for url_model, data in zip(data_chunk, gathered_data):
             if isinstance(data, Exception):
@@ -58,6 +76,9 @@ class MPUrPuller(Process):
     def _squeeze_gathered_data(
             gathered_data: List[Tuple[List[pydantic.BaseModel], List[DependedObjectUrlModel]]]
     ) -> Tuple[List[pydantic.BaseModel], List[DependedObjectUrlModel]]:
+        """
+        Convert list of pairs to a pair of lists
+        """
         st_time = time.time()
 
         all_objects = []
@@ -74,6 +95,13 @@ class MPUrPuller(Process):
             data_chunk: List[DependedObjectUrlModel],
             session: aiohttp.ClientSession
     ) -> Tuple[Tuple[List[pydantic.BaseModel], List[DependedObjectUrlModel]]]:
+        """
+        Async parse data for source objects chunk
+
+        :param data_chunk: chunk of source objects
+        :param session: aiohttp session
+        :return: tuple of pairs of gathered objects and url and meta
+        """
         gathered_data = await asyncio.gather(*[
             self._object_parser.get_scrapped_objects(
                 depended_object=url_object,
@@ -84,6 +112,9 @@ class MPUrPuller(Process):
         return gathered_data
 
     async def _handle_chunk_data(self, data_chunk: List[DependedObjectUrlModel], session: aiohttp.ClientSession):
+        """
+        Gather objects of source objects chunk, and put results to queues
+        """
         st_time = time.time()
 
         gathered_data = await self._gather_data(

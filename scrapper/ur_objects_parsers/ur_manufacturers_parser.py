@@ -11,6 +11,9 @@ logger = logging.getLogger(__name__)
 
 
 class UrManufacturersParser(UrBaseParser):
+    """
+    Class to extract Manufacturer objects from URParts site
+    """
     _CONTAINER_CLASS_NAME: str = "c_container allmakes"
     PARSED_OBJECT_TYPE_NAME: str = "MANUFACTURER"
 
