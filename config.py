@@ -48,6 +48,3 @@ class ScrapperAppConfig:
 
     PARTS_TABLE_NAME = "parts_models_categories"
     PARTS_TABLE_FIELDS = ["number", "spec", "model_name", "category_name"]
-
-    SCRAP_DATA: bool = get_env("SCRAP_DATA", default=False, cast=bool)
-    UPLOAD_DATA: bool = get_env("UPLOAD_DATA", default=True, cast=bool)
