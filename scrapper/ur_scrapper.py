@@ -21,10 +21,7 @@ from scrapper.ur_objects_savers import (
 )
 from scrapper.ur_models import DependedObjectUrlModel
 
-logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
+
 logger = logging.getLogger(__name__)
 
 
