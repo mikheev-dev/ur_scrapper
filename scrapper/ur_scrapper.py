@@ -149,7 +149,7 @@ class UrScrapper:
             src_q=self._parts_urls_q,
             objects_dst_q=self._parts_saver_q,
             depended_objects_urls_q=None,
-            chunk_size=300,
+            chunk_size=10,
         )
         self._pullers_processes.append(self._parts_puller_process)
 
